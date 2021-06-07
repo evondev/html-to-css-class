@@ -138,10 +138,12 @@ export function activate(context: vscode.ExtensionContext) {
             item.split(" ").length > 1 ? item.split(" ") : item
           );
           let newClassName2 =
-            word
-              .split(" ")
-              .map((item) => `.${item.replace(/\s+/gm, ".")}`)
-              .join("") + "{\n}";
+            word.split(" ").length > 1
+              ? word
+                  .split(" ")
+                  .map((item) => `.${item.replace(/\s+/gm, ".")}`)
+                  .join("") + "{\n}"
+              : [];
           let newArr3 = [...newArr, newClassName2];
           let newFlat = flatDeep(newArr3, 10);
           let setClassFlat = new Set([...newFlat]);
