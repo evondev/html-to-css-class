@@ -130,6 +130,9 @@ export function activate(context: vscode.ExtensionContext) {
           let flatClassName2 = [...setClassFlat];
           let x = [...flatClassName2].map((item) => `${item}`);
           vscode.env.clipboard.writeText(x.join("\n"));
+          vscode.window.showInformationMessage(
+            "Copied to clipboard successfully"
+          );
         } else {
           let arrWord = word.split(" ").map((item) => `.${item}{\n\n}`);
           let setClass = new Set([...arrWord]);
@@ -150,6 +153,9 @@ export function activate(context: vscode.ExtensionContext) {
           let flatClassName2 = [...setClassFlat];
           let x = [...flatClassName2].map((item) => `${item}`);
           vscode.env.clipboard.writeText(x.join("\n"));
+          vscode.window.showInformationMessage(
+            "Copied to clipboard successfully"
+          );
         }
       }
     }
@@ -190,6 +196,9 @@ export function activate(context: vscode.ExtensionContext) {
           let x = [...flatClassName2].map((item) => `.${item}{\n\n}`);
           let y = convertToSass(x);
           vscode.env.clipboard.writeText(y);
+          vscode.window.showInformationMessage(
+            "Copied to clipboard successfully"
+          );
         } else {
           let arrWord = word
             .split(" ")
@@ -217,6 +226,9 @@ export function activate(context: vscode.ExtensionContext) {
           let x = [...flatClassName2].map((item) => `.${item}{ }`);
           let y = convertToSass(x);
           vscode.env.clipboard.writeText(y);
+          vscode.window.showInformationMessage(
+            "Copied to clipboard successfully"
+          );
         }
       }
     }
