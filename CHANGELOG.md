@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "copy-class-name" extension will be documented in this file.
+## 0.0.9
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Fix function `Copy Sass`
 
-## [Unreleased]
+## 0.0.8
 
-- Initial release
+- Optimize code only

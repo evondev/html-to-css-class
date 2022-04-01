@@ -43,19 +43,19 @@ function convertToSass(content: string[]) {
     }
 
     let newStr = splitAtFirstSpace(element, prefixer);
-
     if (!newStr[0].includes("{")) {
       filterClass.push(newStr);
     } else if (newStr[0].includes("{")) {
       let next = content[index + 1]
-        .replace(".", "")
-        .replace(/\s+/gm, "")
-        .replace("{}", "");
+        ? content[index + 1]
+            .replace(".", "")
+            .replace(/\s+/gm, "")
+            .replace("{}", "")
+        : "";
       let prev = newStr[0]
-        .replace(".", "")
-        .replace(/\s+/gm, "")
-        .replace("{}", "");
-      if (!next.includes(prev) && (next.includes("-") || next.includes("_"))) {
+        ? newStr[0].replace(".", "").replace(/\s+/gm, "").replace("{}", "")
+        : "";
+      if (!next.includes(prev)) {
         otherClass.push(newStr);
       }
     }
@@ -73,32 +73,19 @@ function convertToSass(content: string[]) {
   return template.trim();
 }
 
-function flatDeep(arr: any, d = 1) {
-  return d > 0
-    ? arr.reduce(
-        (acc: any, val: any) =>
-          acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val),
-        []
-      )
-    : arr.slice();
-}
-
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
     "generate-css-class.classCopy",
-    () => {
-      // code here
+    async () => {
       const editor = vscode.window.activeTextEditor;
-
       if (editor) {
-        const document = editor.document;
-        const selection = editor.selection;
-        let word = document.getText(selection);
+        const { document, selection } = editor;
+        let selectionText = document.getText(selection);
         const classPattern =
           /(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]/gm;
-        const className = word.match(classPattern);
-        if (className) {
-          let newClassName = className
+        const matchesClass = selectionText.match(classPattern);
+        if (matchesClass) {
+          const filterClass = matchesClass
             .map(
               (el) =>
                 `${el
@@ -109,50 +96,18 @@ export function activate(context: vscode.ExtensionContext) {
             .join(" ")
             .split(" ")
             .map((el) => `.${el}{\n\n}`);
-          let setClass = new Set([...newClassName]);
-          let flatClassName = [...setClass];
-          let newArr = flatClassName.map((item) =>
-            item.split(" ").length > 1 ? item.split(" ") : item
-          );
-          let newClassName2 = className
-            .map(
-              (el) =>
-                `.${el
-                  .replace(/"/g, "")
-                  .replace("class=", "")
-                  .replace("className=", "")}`
-            )
-            .filter((item) => item.split(" ").length > 1)
-            .map((item) => `${item.replace(/\s+/gm, ".")}{\n\n}`);
-          let newArr3 = [...newArr, ...newClassName2];
-          let newFlat = flatDeep(newArr3, 10);
-          let setClassFlat = new Set([...newFlat]);
-          let flatClassName2 = [...setClassFlat];
-          let x = [...flatClassName2].map((item) => `${item}`);
-          vscode.env.clipboard.writeText(x.join("\n"));
+          let uniqueClass = [...new Set([...filterClass])];
+          vscode.env.clipboard.writeText(uniqueClass.join("\n"));
           vscode.window.showInformationMessage(
             "Copied to clipboard successfully"
           );
         } else {
-          let arrWord = word.split(" ").map((item) => `.${item}{\n\n}`);
-          let setClass = new Set([...arrWord]);
-          let flatClassName = [...setClass];
-          let newArr = flatClassName.map((item) =>
-            item.split(" ").length > 1 ? item.split(" ") : item
-          );
-          let newClassName2 =
-            word.split(" ").length > 1
-              ? word
-                  .split(" ")
-                  .map((item) => `.${item.replace(/\s+/gm, ".")}`)
-                  .join("") + "{\n}"
-              : [];
-          let newArr3 = [...newArr, newClassName2];
-          let newFlat = flatDeep(newArr3, 10);
-          let setClassFlat = new Set([...newFlat]);
-          let flatClassName2 = [...setClassFlat];
-          let x = [...flatClassName2].map((item) => `${item}`);
-          vscode.env.clipboard.writeText(x.join("\n"));
+          let arrWord = selectionText
+            .replace(/"/g, "")
+            .split(" ")
+            .map((item) => `.${item}{\n\n}`);
+          let uniqueClass = [...new Set([...arrWord])];
+          vscode.env.clipboard.writeText(uniqueClass.join("\n"));
           vscode.window.showInformationMessage(
             "Copied to clipboard successfully"
           );
@@ -174,33 +129,25 @@ export function activate(context: vscode.ExtensionContext) {
           /(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]/gm;
         const className = word.match(classPattern);
         if (className) {
-          let newClassName = className.map(
+          let filterClassName = className.map(
             (el) =>
               `${el
                 .replace(/"/g, "")
                 .replace("class=", "")
                 .replace("className=", "")}`
           );
-          let setClass = new Set([...newClassName]);
-          let flatClassName = [...setClass];
-          let newArr = flatClassName.map((item) =>
+          const arrClass = [...filterClassName].map((item) =>
             item.split(" ").length > 1 ? item.split(" ") : item
           );
-          let newArr2 = flatClassName
-            .filter((item) => item.split(" ").length > 1)
-            .map((item) => `${item.replace(/\s+/gm, ".")}`);
-          let newArr3 = [...newArr, ...newArr2];
-          let newFlat = flatDeep(newArr3, 10);
-          let setClassFlat = new Set([...newFlat]);
-          let flatClassName2 = [...setClassFlat];
-          let x = [...flatClassName2].map((item) => `.${item}{\n\n}`);
-          let y = convertToSass(x);
-          vscode.env.clipboard.writeText(y);
+          const allClass = arrClass.flat(Infinity) as any;
+          let uniqueClass = [...new Set([...allClass])];
+          const generateClassName = uniqueClass.map((item) => `.${item}{\n\n}`);
+          vscode.env.clipboard.writeText(convertToSass(generateClassName));
           vscode.window.showInformationMessage(
             "Copied to clipboard successfully"
           );
         } else {
-          let arrWord = word
+          let filterClass = word
             .split(" ")
             .map(
               (el) =>
@@ -209,23 +156,9 @@ export function activate(context: vscode.ExtensionContext) {
                   .replace("class=", "")
                   .replace("className=", "")}`
             );
-          let setClass = new Set([...arrWord]);
-          let flatClassName = [...setClass];
-          let newArr = flatClassName.map((item) =>
-            item.split(" ").length > 1 ? item.split(" ") : item
-          );
-          let newArr2 = word
-            .split(" ")
-            .map((item) => `${item.replace(/\s+/gm, ".")}`)
-            .join(".");
-
-          let newArr3 = [...newArr, newArr2];
-          let newFlat = flatDeep(newArr3, 10);
-          let setClassFlat = new Set([...newFlat]);
-          let flatClassName2 = [...setClassFlat];
-          let x = [...flatClassName2].map((item) => `.${item}{ }`);
-          let y = convertToSass(x);
-          vscode.env.clipboard.writeText(y);
+          let uniqueClass = [...new Set([...filterClass])];
+          const generateClassName = uniqueClass.map((item) => `.${item}{\n\n}`);
+          vscode.env.clipboard.writeText(convertToSass(generateClassName));
           vscode.window.showInformationMessage(
             "Copied to clipboard successfully"
           );

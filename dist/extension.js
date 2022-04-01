@@ -1,45 +1,19 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ([
-/* 0 */,
-/* 1 */
-/***/ ((module) => {
+/* 0 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-module.exports = require("vscode");;
 
-/***/ })
-/******/ 	]);
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-var exports = __webpack_exports__;
-
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deactivate = exports.activate = void 0;
 const vscode = __webpack_require__(1);
@@ -89,14 +63,15 @@ function convertToSass(content) {
         }
         else if (newStr[0].includes("{")) {
             let next = content[index + 1]
-                .replace(".", "")
-                .replace(/\s+/gm, "")
-                .replace("{}", "");
+                ? content[index + 1]
+                    .replace(".", "")
+                    .replace(/\s+/gm, "")
+                    .replace("{}", "")
+                : "";
             let prev = newStr[0]
-                .replace(".", "")
-                .replace(/\s+/gm, "")
-                .replace("{}", "");
-            if (!next.includes(prev) && (next.includes("-") || next.includes("_"))) {
+                ? newStr[0].replace(".", "").replace(/\s+/gm, "").replace("{}", "")
+                : "";
+            if (!next.includes(prev)) {
                 otherClass.push(newStr);
             }
         }
@@ -113,23 +88,16 @@ function convertToSass(content) {
     }
     return template.trim();
 }
-function flatDeep(arr, d = 1) {
-    return d > 0
-        ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), [])
-        : arr.slice();
-}
 function activate(context) {
-    let disposable = vscode.commands.registerCommand("generate-css-class.classCopy", () => {
-        // code here
+    let disposable = vscode.commands.registerCommand("generate-css-class.classCopy", () => __awaiter(this, void 0, void 0, function* () {
         const editor = vscode.window.activeTextEditor;
         if (editor) {
-            const document = editor.document;
-            const selection = editor.selection;
-            let word = document.getText(selection);
+            const { document, selection } = editor;
+            let selectionText = document.getText(selection);
             const classPattern = /(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]/gm;
-            const className = word.match(classPattern);
-            if (className) {
-                let newClassName = className
+            const matchesClass = selectionText.match(classPattern);
+            if (matchesClass) {
+                const filterClass = matchesClass
                     .map((el) => `${el
                     .replace(/"/g, "")
                     .replace("class=", "")
@@ -137,45 +105,21 @@ function activate(context) {
                     .join(" ")
                     .split(" ")
                     .map((el) => `.${el}{\n\n}`);
-                let setClass = new Set([...newClassName]);
-                let flatClassName = [...setClass];
-                let newArr = flatClassName.map((item) => item.split(" ").length > 1 ? item.split(" ") : item);
-                let newClassName2 = className
-                    .map((el) => `.${el
-                    .replace(/"/g, "")
-                    .replace("class=", "")
-                    .replace("className=", "")}`)
-                    .filter((item) => item.split(" ").length > 1)
-                    .map((item) => `${item.replace(/\s+/gm, ".")}{\n\n}`);
-                let newArr3 = [...newArr, ...newClassName2];
-                let newFlat = flatDeep(newArr3, 10);
-                let setClassFlat = new Set([...newFlat]);
-                let flatClassName2 = [...setClassFlat];
-                let x = [...flatClassName2].map((item) => `${item}`);
-                vscode.env.clipboard.writeText(x.join("\n"));
+                let uniqueClass = [...new Set([...filterClass])];
+                vscode.env.clipboard.writeText(uniqueClass.join("\n"));
                 vscode.window.showInformationMessage("Copied to clipboard successfully");
             }
             else {
-                let arrWord = word.split(" ").map((item) => `.${item}{\n\n}`);
-                let setClass = new Set([...arrWord]);
-                let flatClassName = [...setClass];
-                let newArr = flatClassName.map((item) => item.split(" ").length > 1 ? item.split(" ") : item);
-                let newClassName2 = word.split(" ").length > 1
-                    ? word
-                        .split(" ")
-                        .map((item) => `.${item.replace(/\s+/gm, ".")}`)
-                        .join("") + "{\n}"
-                    : [];
-                let newArr3 = [...newArr, newClassName2];
-                let newFlat = flatDeep(newArr3, 10);
-                let setClassFlat = new Set([...newFlat]);
-                let flatClassName2 = [...setClassFlat];
-                let x = [...flatClassName2].map((item) => `${item}`);
-                vscode.env.clipboard.writeText(x.join("\n"));
+                let arrWord = selectionText
+                    .replace(/"/g, "")
+                    .split(" ")
+                    .map((item) => `.${item}{\n\n}`);
+                let uniqueClass = [...new Set([...arrWord])];
+                vscode.env.clipboard.writeText(uniqueClass.join("\n"));
                 vscode.window.showInformationMessage("Copied to clipboard successfully");
             }
         }
-    });
+    }));
     let sassDisposable = vscode.commands.registerCommand("generate-css-class.sassClassCopy", () => {
         // code here
         const editor = vscode.window.activeTextEditor;
@@ -186,46 +130,27 @@ function activate(context) {
             const classPattern = /(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]/gm;
             const className = word.match(classPattern);
             if (className) {
-                let newClassName = className.map((el) => `${el
+                let filterClassName = className.map((el) => `${el
                     .replace(/"/g, "")
                     .replace("class=", "")
                     .replace("className=", "")}`);
-                let setClass = new Set([...newClassName]);
-                let flatClassName = [...setClass];
-                let newArr = flatClassName.map((item) => item.split(" ").length > 1 ? item.split(" ") : item);
-                let newArr2 = flatClassName
-                    .filter((item) => item.split(" ").length > 1)
-                    .map((item) => `${item.replace(/\s+/gm, ".")}`);
-                let newArr3 = [...newArr, ...newArr2];
-                let newFlat = flatDeep(newArr3, 10);
-                let setClassFlat = new Set([...newFlat]);
-                let flatClassName2 = [...setClassFlat];
-                let x = [...flatClassName2].map((item) => `.${item}{\n\n}`);
-                let y = convertToSass(x);
-                vscode.env.clipboard.writeText(y);
+                const arrClass = [...filterClassName].map((item) => item.split(" ").length > 1 ? item.split(" ") : item);
+                const allClass = arrClass.flat(Infinity);
+                let uniqueClass = [...new Set([...allClass])];
+                const generateClassName = uniqueClass.map((item) => `.${item}{\n\n}`);
+                vscode.env.clipboard.writeText(convertToSass(generateClassName));
                 vscode.window.showInformationMessage("Copied to clipboard successfully");
             }
             else {
-                let arrWord = word
+                let filterClass = word
                     .split(" ")
                     .map((el) => `${el
                     .replace(/"/g, "")
                     .replace("class=", "")
                     .replace("className=", "")}`);
-                let setClass = new Set([...arrWord]);
-                let flatClassName = [...setClass];
-                let newArr = flatClassName.map((item) => item.split(" ").length > 1 ? item.split(" ") : item);
-                let newArr2 = word
-                    .split(" ")
-                    .map((item) => `${item.replace(/\s+/gm, ".")}`)
-                    .join(".");
-                let newArr3 = [...newArr, newArr2];
-                let newFlat = flatDeep(newArr3, 10);
-                let setClassFlat = new Set([...newFlat]);
-                let flatClassName2 = [...setClassFlat];
-                let x = [...flatClassName2].map((item) => `.${item}{ }`);
-                let y = convertToSass(x);
-                vscode.env.clipboard.writeText(y);
+                let uniqueClass = [...new Set([...filterClass])];
+                const generateClassName = uniqueClass.map((item) => `.${item}{\n\n}`);
+                vscode.env.clipboard.writeText(convertToSass(generateClassName));
                 vscode.window.showInformationMessage("Copied to clipboard successfully");
             }
         }
@@ -237,9 +162,48 @@ exports.activate = activate;
 function deactivate() { }
 exports.deactivate = deactivate;
 
-})();
 
-module.exports = __webpack_exports__;
+/***/ }),
+/* 1 */
+/***/ ((module) => {
+
+module.exports = require("vscode");;
+
+/***/ })
+/******/ 	]);
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__(0);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=extension.js.map

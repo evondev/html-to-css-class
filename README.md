@@ -1,17 +1,14 @@
 # Generate CSS class from HTML
 
-Generate CSS class or Sass class to clipboard from HTML
+Generate CSS, Sass class to clipboard from HTML
 
-## About me
+## Tutorial
 
-- My name is Evondev, a Frontend Developer. I love to working with HTML CSS and Javascript. In free time I write blog to share knowledge to everyone, and develope some useful website and also VSCode extension to help other Developers. You can check more at section below.
-
-## My Products
-
-- [evondev.com](https://evondev.com)
-- [codingui.dev](https://codingui.dev)
-- [evon.dev](https://evon.dev)
-- [Evondev Snippets](https://marketplace.visualstudio.com/items?itemName=evondev.evondev-snippets&ssr=false) VScode extension.
+- Select your HTML code
+- `Ctrl/Command + Shift + P`
+- `Copy CSS class` or `Copy Sass class` base on your coding styles
+- Paste in your CSS or Sass file
+- Enjoy
 
 ## Screenshots
 
@@ -27,10 +24,7 @@ Generate CSS class or Sass class to clipboard from HTML
 ![alt text](./screenshots/sass1.png "Typing command")
 ![alt text](./screenshots/sass2.png "Result")
 
-## Tutorial
+## Checkout my other extensions
 
-- Select your HTML code
-- `Ctrl/Command + Shift + P`
-- `Copy CSS class` or `Copy Sass class` base on your coding styles
-- Open your CSS or Sass file and paste
-- Enjoy :D
+- [Evondev Dracula](https://marketplace.visualstudio.com/items?itemName=evondev.dracula-high-contrast&ssr=false) VScode extension.
+- [Evondev Snippets](https://marketplace.visualstudio.com/items?itemName=evondev.evondev-snippets&ssr=false) VScode extension.
