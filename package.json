@@ -3,9 +3,9 @@
   "displayName": "Evondev - HTML to CSS Class",
   "description": "Generate CSS class from HTML",
   "publisher": "evondev",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
-    "vscode": "^1.56.0"
+    "vscode": "^1.20.0"
   },
   "repository": {
     "type": "git",
