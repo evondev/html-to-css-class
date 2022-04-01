@@ -43,19 +43,19 @@ function convertToSass(content: string[]) {
     }
 
     let newStr = splitAtFirstSpace(element, prefixer);
-
     if (!newStr[0].includes("{")) {
       filterClass.push(newStr);
     } else if (newStr[0].includes("{")) {
       let next = content[index + 1]
-        .replace(".", "")
-        .replace(/\s+/gm, "")
-        .replace("{}", "");
+        ? content[index + 1]
+            .replace(".", "")
+            .replace(/\s+/gm, "")
+            .replace("{}", "")
+        : "";
       let prev = newStr[0]
-        .replace(".", "")
-        .replace(/\s+/gm, "")
-        .replace("{}", "");
-      if (!next.includes(prev) && (next.includes("-") || next.includes("_"))) {
+        ? newStr[0].replace(".", "").replace(/\s+/gm, "").replace("{}", "")
+        : "";
+      if (!next.includes(prev)) {
         otherClass.push(newStr);
       }
     }
